@@ -1,0 +1,27 @@
+body {
+    background-color: #263238;
+}
+table {
+    margin: 0 auto; /* 中央寄せ */
+    width: 360px;
+    height: 800px;
+}
+td {
+    width: 10%; /* 横10マス */
+    height: 5%; /* 縦20マス */
+}
+.default {
+    background-color: #455A64;
+}
+.stick {
+    background-color: #03A9F4;
+}
+button{
+    width: 40px;
+    height: 40px;
+    background-color: #03af40;
+}
+.minosplace{
+    text-align:center;
+    line-height:0;
+}
