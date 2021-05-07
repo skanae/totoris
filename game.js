@@ -42,7 +42,7 @@ function draw2() {
                     $(elemTd).addClass("stick"); // 1の時にはstickクラスを割り振る
                     break;
                 default:
-                    $(elemTd).addClass("transparent"); // それ以外の時にはdefaultクラスを割り振る
+                    $(elemTd).addClass("default"); // それ以外の時にはdefaultクラスを割り振る
             }
         })
     });
