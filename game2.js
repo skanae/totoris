@@ -22,7 +22,15 @@ var mino11=[[0,0],[0,0]]
 var mino21=[[0,0],[0,1]]
 var mino22=[[0,0],[1,0]]
 var mino23=[[0,0],[1,1]]
-var mino=[mino11,mino21,mino22,mino23]
+var mino31=[[0,0],[0,1],[0,2]]
+var mino32=[[0,0],[1,0],[2,0]]
+var mino33=[[0,0],[1,1],[2,2]]
+var mino34=[[0,0],[1,0],[1,-1]]
+var mino35=[[0,0],[1,0],[1,1]]
+var mino36=[[0,0],[0,1],[1,1]]
+var mino37=[[0,0],[0,1],[1,0]]
+var mino99=[[0,0],[1,1],[2,2],[-1,-1],[-2,-2]]
+var mino=[mino99]//mino11,mino21,mino22,mino23,mino31,mino32,mino33,mino34,mino35,mino36,mino37
 
 function generateTempmino(){
 var ramdomnumber=Math.floor(Math.random()*(mino.length))
@@ -32,7 +40,7 @@ var tmpmino=mino[ramdomnumber] //このターン使うミノ
 return tmpmino
 }
 
-function sensorCanput(canput){
+function sensorCanput(canput,array,tmpmino){
 for (let y = 0; y < array.length; y++) {
     for (let x = 0; x < array.length; x++) {
         var looptime=0;
@@ -73,7 +81,7 @@ function draw() {
 function draw2() {
     $('#game2').find('tr').each(function(i, elemTr) { // trタグそれぞれに対する処理
         $(elemTr).children().each(function(j, elemTd) { // tdタグそれぞれに対する処理
-            // $(elemTd).removeClass(); // まずはクラスをすべてなしにする
+            $(elemTd).removeClass(); // まずはクラスをすべてなしにする
             switch (array2[i][j]) {
                 case 1:
                     $(elemTd).addClass("stick"); // 1の時にはstickクラスを割り振る
@@ -85,15 +93,24 @@ function draw2() {
     });
 }
 
-function updateArray(array,mino,index){
+function eraseArray2(array2){
+    for (let i = 0; i < array2.length; i++) {
+        for (let j = 0; j < array2.length; j++) {
+            array2[i][j]=0
+        }  
+    }
+    return array2
+}
+function updateArray(array,mino,index){ //tableに配置されたミノに応じて更新
     for (let i = 0; i < mino.length; i++) {
         array[mino[i][0]+index[0]][mino[i][1]+index[1]]=1
     }
     return array
 }
 
-//なんか縦横でミスってる
-function clearArray(array){
+//scoreおかしい
+
+function clearArray(array,score){
     rowflag=[]
     colomflag=[]
     // boxflag=[]
@@ -121,22 +138,22 @@ function clearArray(array){
             colomflag.push(i)
         }
     }
+    
+    score+=((rowflag.reduce((a,x) => a+=x,0))+(colomflag.reduce((a,x) => a+=x,0)))*100
+
     for (let i = 0; i < rowflag.length; i++) {
         array = rowdelete(array,rowflag[i])
     }
     for (let i = 0; i < colomflag.length; i++) {
         array = colomdelete(array,colomflag[i])
     }
-    // for (let i = 0; i < array.length; i++) {
-    //     const element = array[i];
-        
-    // }
-    return array
+    
+    return [array,score]
 }
 
 function rowdelete(array,row){
     for (let i = 0; i < array.length; i++) {
-        array[raw][i]=0
+        array[row][i]=0
     }
     return array
 }
@@ -156,25 +173,27 @@ function inArray(array,youso){
 }
 const isNumber = function(value) {
     return ((typeof value === 'number') && (isFinite(value)));
-  };
-//mino生成
-var tmpmino=generateTempmino()
-// console.log("tmpmino is ",tmpmino[0],tmpmino[1])
-//array2を更新してtmpmino表示
-array2=updateArray(array2,tmpmino,[2,2])
+};
+
+// function initmino(array2){
+//     var tmpmino=generateTempmino() //mino生成
+//     array2=updateArray(array2,tmpmino,[2,2]) //array2を更新してtmpmino表示
+//     draw2()
+//     canput=[]
+//     canput=sensorCanput(canput) //tmpミノが置ける座標の配列を出す
+// }
+
+var tmpmino=generateTempmino() //mino生成
+array2=updateArray(array2,tmpmino,[2,2]) //array2を更新してtmpmino表示
 draw2()
 
-//tmpミノが置ける座標の配列を出す
-//上から順にみて行って全部OKならその座標を配列に
 canput=[]
-canput=sensorCanput(canput)
+canput=sensorCanput(canput,array,tmpmino) //tmpミノが置ける座標の配列を出す
 console.log(canput)
+score=0
 
-
-//formからどこに置くかを取得 buttonつけたほうがいいかも
-var val = null
-function showMessage(){
-
+function showMessage(){ //formからどこに置くかを取得
+var val = null 
 var text = document.getElementById("message")
 val = text.value
 console.log("val is "+ val)
@@ -187,15 +206,33 @@ input=x.map(i=>Number(i))
 // console.log("canput[0] == input",canput[0] == input)
 // console.log(canput.indexOf(input))
 
+
 if(inArray(canput,input)){
     var output = val+"に配置しました"
     array=updateArray(array,tmpmino,input)
+    arrayandscore=clearArray(array,score)
+    array=arrayandscore[0]
+    score=arrayandscore[1]
     draw()
-    array=clearArray(array)
-    draw()
+
+    array2=eraseArray2(array2)
+    console.log(array2)
+    var tmpmino2=generateTempmino() //mino生成
+    array2=updateArray(array2,tmpmino2,[2,2]) //array2を更新してtmpmino表示
+    draw2()
+
+    canput=[]
+    canput=sensorCanput(canput,array,tmpmino2) //tmpミノが置ける座標の配列を出す 
+
+    console.log(canput)
+    tmpmino=tmpmino2
 }
 else{
     var output = val+"にはおけません"
+}
+
+if(!canput.length){
+    alert("ゲームオーバーです。スコアは"+score)
 }
 
 document.getElementById("output-message").innerHTML=output
